@@ -2,6 +2,7 @@ package com.climb.gateway.filter;
 
 import com.alibaba.fastjson.JSON;
 import com.climb.common.constant.CommonConstant;
+import com.climb.gateway.login.bean.UserDetails;
 import com.climb.gateway.util.Util;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
@@ -23,7 +24,7 @@ public class HeadersFilter implements WebFilter {
                 .filter(c -> c.getAuthentication() != null)
                 .map(SecurityContext::getAuthentication)
                 .filter(Authentication::isAuthenticated)
-                .map(authentication -> Util.addHeader(exchange, CommonConstant.USER_INFO, JSON.toJSONString(authentication.getPrincipal())))
+                .map(authentication -> Util.addHeader(exchange, CommonConstant.USER_INFO, JSON.toJSONString(((UserDetails)authentication.getPrincipal()).getUserBaseInfo())))
                 .flatMap(chain::filter)
                 .switchIfEmpty(chain.filter(exchange));
     }

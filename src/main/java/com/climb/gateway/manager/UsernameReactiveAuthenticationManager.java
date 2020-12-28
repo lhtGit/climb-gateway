@@ -2,7 +2,7 @@ package com.climb.gateway.manager;
 
 import com.climb.common.user.auth.LoginUserInfo;
 import com.climb.common.user.auth.UserLoginType;
-import com.climb.gateway.login.service.LoginService;
+import com.climb.gateway.login.LoginService;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;

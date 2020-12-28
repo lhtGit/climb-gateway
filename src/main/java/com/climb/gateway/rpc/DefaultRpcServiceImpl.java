@@ -1,19 +1,17 @@
-package com.climb.gateway.login.service.impl;
+package com.climb.gateway.rpc;
 
 import com.climb.common.bean.Result;
 import com.climb.common.config.ApplicationContextConfig;
 import com.climb.common.exception.GlobalException;
 import com.climb.common.user.auth.LoginUserInfo;
 import com.climb.gateway.exception.ErrorCode;
-import com.climb.gateway.login.UserDetails;
-import com.climb.gateway.login.authority.AuthorityInfo;
-import com.climb.gateway.login.service.RpcService;
+import com.climb.gateway.login.bean.UserDetails;
+import com.climb.gateway.login.bean.AuthorityInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
 
@@ -21,7 +19,6 @@ import javax.annotation.Resource;
 import java.nio.charset.Charset;
 import java.time.Duration;
 import java.util.Collection;
-import java.util.stream.Stream;
 
 /**
  * gateway访问其他服务默认实现
@@ -38,7 +35,9 @@ public class DefaultRpcServiceImpl implements RpcService {
     public Mono<UserDetails> login(Mono<LoginUserInfo> userInfo) {
         return  webClient.post()
                 .uri(uriBuilder ->
-                        uriBuilder.host("192.168.8.231:8181")
+                        uriBuilder.scheme("http")
+                                .host("127.0.0.1")
+                                .port(8181)
                                 .path("/erp/base/employee/login")
                                 .build()
                 )
@@ -53,6 +52,9 @@ public class DefaultRpcServiceImpl implements RpcService {
                 .map(userDetailsResult -> {
                     checkUser(userDetailsResult);
                     return userDetailsResult.getData();
+                })
+                .doOnError(e -> {
+                    log.error("登录获取用户信息异常",e);
                 });
     }
 
@@ -60,7 +62,9 @@ public class DefaultRpcServiceImpl implements RpcService {
     public Mono<Collection<AuthorityInfo>> getAuthorityAll() {
         return webClient.get()
                 .uri(uriBuilder ->
-                        uriBuilder.host("192.168.8.231:8181")
+                        uriBuilder.scheme("http")
+                                .host("127.0.0.1")
+                                .port(8181)
                                 .path("/erp/base/sys/auth/all")
                                 .build()
                 )
@@ -77,8 +81,6 @@ public class DefaultRpcServiceImpl implements RpcService {
                 })
                 .doOnError(e -> {
                     log.error("获取所有权限异常",e);
-                    //停止项目
-                    ApplicationContextConfig.showdown();
                 });
     }
 

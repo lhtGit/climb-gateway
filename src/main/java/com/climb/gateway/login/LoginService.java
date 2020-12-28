@@ -1,4 +1,4 @@
-package com.climb.gateway.login.service;
+package com.climb.gateway.login;
 
 import com.climb.common.user.auth.LoginUserInfo;
 import org.springframework.security.core.Authentication;

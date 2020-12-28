@@ -1,4 +1,4 @@
-package com.climb.gateway.login.authority;
+package com.climb.gateway.login.bean;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

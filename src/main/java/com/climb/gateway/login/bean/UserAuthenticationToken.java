@@ -1,4 +1,4 @@
-package com.climb.gateway.login.authority;
+package com.climb.gateway.login.bean;
 
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -17,17 +17,10 @@ public class UserAuthenticationToken extends AbstractAuthenticationToken {
     private Object credentials;
 
 
-    public UserAuthenticationToken(Object principal, Object credentials) {
-        super(null);
-        this.principal = principal;
-        this.credentials = credentials;
-        setAuthenticated(false);
-    }
-
-    public UserAuthenticationToken(Object principal, Object credentials, Collection<SimpleGrantedAuthority> authorities) {
+    public UserAuthenticationToken(Object principal, Collection<SimpleGrantedAuthority> authorities) {
         super(authorities);
         this.principal = principal;
-        this.credentials = credentials;
+        this.credentials = null;
         // must use super, as we override
         super.setAuthenticated(true);
     }

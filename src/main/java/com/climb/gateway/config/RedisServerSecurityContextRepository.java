@@ -1,18 +1,19 @@
 package com.climb.gateway.config;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import com.climb.common.exception.GlobalException;
-import com.climb.common.user.UserBaseInfo;
 import com.climb.gateway.bean.JwtUser;
 import com.climb.gateway.constant.GatewayConstant;
 import com.climb.gateway.exception.ErrorCode;
-import com.climb.gateway.login.UserDetails;
-import com.climb.gateway.login.authority.UserAuthenticationToken;
+import com.climb.gateway.login.bean.UserAuthenticationToken;
+import com.climb.gateway.login.bean.UserDetails;
 import com.climb.gateway.util.JwtTokenUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.web.server.context.ServerSecurityContextRepository;
@@ -20,6 +21,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
+
+import java.util.Collection;
+import java.util.stream.Collectors;
 
 
 /**
@@ -30,8 +34,8 @@ import reactor.core.publisher.Mono;
 @Component
 @Slf4j
 public class RedisServerSecurityContextRepository implements ServerSecurityContextRepository {
-//    @Autowired
-//    private StringRedisTemplate redisTemplate;
+    @Autowired
+    private StringRedisTemplate redisTemplate;
 
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
@@ -42,11 +46,10 @@ public class RedisServerSecurityContextRepository implements ServerSecurityConte
         Authentication authentication = context.getAuthentication();
         //获得用户信息
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        UserBaseInfo userBaseInfo = userDetails.getUserBaseInfo();
         //保存用户信息
-//        redisTemplate.opsForValue().set(GatewayConstant.USER_AUTH_REDIS+userBaseInfo.getId()
-//                , JSON.toJSONString(new UserAuthenticationToken(userBaseInfo, authentication.getAuthorities()))
-//        );
+        redisTemplate.opsForValue().set(GatewayConstant.USER_AUTH_REDIS+userDetails.getFlag()
+                , JSON.toJSONString(userDetails)
+        );
         return Mono.empty();
 
     }
@@ -62,12 +65,17 @@ public class RedisServerSecurityContextRepository implements ServerSecurityConte
                 throw new GlobalException(ErrorCode.TOKEN_ACCESS_ILLEGAL);
             }
             String userFlag = userSubject.getUserFlag();
-//            String userInfo = redisTemplate.opsForValue().get(GatewayConstant.USER_AUTH_REDIS+userFlag);
-//            if(!StringUtils.isEmpty(userInfo)){
-//                context = new SecurityContextImpl(JSON.parseObject(userInfo,UserAuthenticationToken.class));
-//            }else{
-//                //TODO 是否在验证token合法后，自动获得用户信息，因为理论来说是应该存在的（先不写）
-//            }
+            String userInfo = redisTemplate.opsForValue().get(GatewayConstant.USER_AUTH_REDIS+userFlag);
+            if(!StringUtils.isEmpty(userInfo)){
+                UserDetails userDetails = JSON.parseObject(userInfo,new TypeReference<UserDetails>(){});
+                //创建 Authentication，设置权限
+                Collection<SimpleGrantedAuthority> authorities = userDetails.getAuthoritys().stream()
+                        .map(SimpleGrantedAuthority::new)
+                        .collect(Collectors.toList());
+                context = new SecurityContextImpl(new UserAuthenticationToken(userDetails,authorities));
+            }else{
+                //TODO 是否在验证token合法后，自动获得用户信息，因为理论来说是应该存在的（先不写）
+            }
         }
         return Mono.justOrEmpty(context);
     }

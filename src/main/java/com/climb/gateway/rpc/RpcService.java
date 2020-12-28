@@ -1,8 +1,8 @@
-package com.climb.gateway.login.service;
+package com.climb.gateway.rpc;
 
 import com.climb.common.user.auth.LoginUserInfo;
-import com.climb.gateway.login.UserDetails;
-import com.climb.gateway.login.authority.AuthorityInfo;
+import com.climb.gateway.login.bean.UserDetails;
+import com.climb.gateway.login.bean.AuthorityInfo;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 

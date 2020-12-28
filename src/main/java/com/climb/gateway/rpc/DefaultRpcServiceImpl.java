@@ -37,8 +37,8 @@ public class DefaultRpcServiceImpl implements RpcService {
                 .uri(uriBuilder ->
                         uriBuilder.scheme("http")
                                 .host("127.0.0.1")
-                                .port(8181)
-                                .path("/erp/base/employee/login")
+                                .port(8082)
+                                .path("/user/test/login")
                                 .build()
                 )
                 .accept(MediaType.APPLICATION_JSON)
@@ -47,7 +47,7 @@ public class DefaultRpcServiceImpl implements RpcService {
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<Result<UserDetails>>() {})
                 //重试1次 指数级增长的时间间隔 因数0.5
-                .retryWhen(Retry.backoff(1, Duration.ofSeconds(5)))
+                //.retryWhen(Retry.backoff(1, Duration.ofSeconds(5)))
                 //逻辑处理
                 .map(userDetailsResult -> {
                     checkUser(userDetailsResult);
@@ -64,8 +64,8 @@ public class DefaultRpcServiceImpl implements RpcService {
                 .uri(uriBuilder ->
                         uriBuilder.scheme("http")
                                 .host("127.0.0.1")
-                                .port(8181)
-                                .path("/erp/base/sys/auth/all")
+                                .port(8082)
+                                .path("/user/test/auth/all")
                                 .build()
                 )
                 .accept(MediaType.APPLICATION_JSON)

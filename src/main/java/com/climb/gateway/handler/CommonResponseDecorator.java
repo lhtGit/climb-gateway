@@ -38,7 +38,7 @@ public class CommonResponseDecorator extends ServerHttpResponseDecorator {
         if (body instanceof Flux&&(response.getStatusCode()==null||response.getStatusCode().isError())) {
             Flux<? extends DataBuffer> fluxBody = (Flux<? extends DataBuffer>) body;
 
-            //TODO 目前只处理微服务404状况
+            // 目前只处理微服务404状况
             if(response.getStatusCode()!=null&&response.getStatusCode().value()==404){
                 return saveLog(fluxBody, JSON.toJSONString(ResultUtil.error(ErrorCode.ERROR_404)));
             }

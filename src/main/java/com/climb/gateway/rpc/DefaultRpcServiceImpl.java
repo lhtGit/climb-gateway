@@ -7,6 +7,7 @@ import com.climb.common.user.auth.LoginUserInfo;
 import com.climb.gateway.exception.ErrorCode;
 import com.climb.gateway.login.bean.UserDetails;
 import com.climb.gateway.login.bean.AuthorityInfo;
+import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
@@ -60,28 +61,31 @@ public class DefaultRpcServiceImpl implements RpcService {
 
     @Override
     public Mono<Collection<AuthorityInfo>> getAuthorityAll() {
-        return webClient.get()
-                .uri(uriBuilder ->
-                        uriBuilder.scheme("http")
-                                .host("127.0.0.1")
-                                .port(8082)
-                                .path("/user/test/auth/all")
-                                .build()
-                )
-                .accept(MediaType.APPLICATION_JSON)
-                .acceptCharset(Charset.defaultCharset())
-                .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<Result<AuthorityInfo>>(){})
-                .flatMap(result -> {
-                    if(!result.isSuccess()){
-                        return Mono.error(new GlobalException(result.getMsg(),result.getCode()));
-                    }
-                    Collection<AuthorityInfo> authorityInfos =  result.getDataList();
-                    return Mono.just(authorityInfos);
-                })
-                .doOnError(e -> {
-                    log.error("获取所有权限异常",e);
-                });
+
+        return Mono.just(Lists.newArrayList());
+
+//        return webClient.get()
+//                .uri(uriBuilder ->
+//                        uriBuilder.scheme("http")
+//                                .host("127.0.0.1")
+//                                .port(8082)
+//                                .path("/user/test/auth/all")
+//                                .build()
+//                )
+//                .accept(MediaType.APPLICATION_JSON)
+//                .acceptCharset(Charset.defaultCharset())
+//                .retrieve()
+//                .bodyToMono(new ParameterizedTypeReference<Result<AuthorityInfo>>(){})
+//                .flatMap(result -> {
+//                    if(!result.isSuccess()){
+//                        return Mono.error(new GlobalException(result.getMsg(),result.getCode()));
+//                    }
+//                    Collection<AuthorityInfo> authorityInfos =  result.getDataList();
+//                    return Mono.just(authorityInfos);
+//                })
+//                .doOnError(e -> {
+//                    log.error("获取所有权限异常",e);
+//                });
     }
 
 

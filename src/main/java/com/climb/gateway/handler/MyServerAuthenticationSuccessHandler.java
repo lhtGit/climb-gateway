@@ -3,7 +3,7 @@ package com.climb.gateway.handler;
 import com.climb.common.util.ResultUtil;
 import com.climb.gateway.bean.UserToken;
 import com.climb.gateway.login.bean.UserDetails;
-import com.climb.gateway.util.JwtTokenUtil;
+import com.climb.gateway.jwt.JwtTokenUtil;
 import com.climb.gateway.util.Util;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -33,6 +33,7 @@ public class JsonExceptionHandler extends DefaultErrorWebExceptionHandler {
         Throwable error = super.getError(request);
         //业务异常处理
         if(error instanceof GlobalException){
+            log.error(error.getMessage());
             return ResultUtil.error(error.getMessage(),((GlobalException) error).getCode()).toMap();
         }
 

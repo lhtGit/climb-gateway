@@ -3,6 +3,7 @@ package com.climb.gateway.manager;
 import com.climb.common.user.auth.LoginUserInfo;
 import com.climb.common.user.auth.UserLoginType;
 import com.climb.gateway.login.LoginService;
+import com.climb.gateway.login.bean.UserAuthentication;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -25,7 +26,7 @@ public class UsernameReactiveAuthenticationManager implements ReactiveAuthentica
     public Mono<Authentication> authenticate(Authentication authentication) {
         String principal = StringUtils.isEmpty(authentication.getPrincipal())?"":authentication.getPrincipal().toString();
         String credentials = StringUtils.isEmpty(authentication.getCredentials())?"":authentication.getCredentials().toString();
-        UserLoginType userLoginType = UserLoginType.USERNAME_PASSOWRD;
+        UserLoginType userLoginType = ((UserAuthentication)authentication).getUserLoginType();
         return loginService.loginAndGetToken(Mono.just(new LoginUserInfo(principal,credentials,userLoginType)));
     }
 

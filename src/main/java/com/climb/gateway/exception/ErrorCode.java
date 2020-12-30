@@ -29,6 +29,10 @@ public enum ErrorCode implements ErrorMessage {
     USER_AUTHORITYS_IS_NULL(3022,"用户权限不能为null"),
     //rsa
     RSA_GENERATE_ERROR(3030,"RAS生成失败"),
+    //parse login form
+    PARSE_LOGIN_TYPE(3040,"解析获取登录类型失败"),
+
+    PARSE_LOGIN_TYPE_NOT_FIND(3041,"登录类型不存在"),
     ;
 
     private final int code;

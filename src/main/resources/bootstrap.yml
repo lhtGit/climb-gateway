@@ -16,15 +16,6 @@ spring:
         # 连接超时时间（毫秒）
         timeout: 5000
 
-customize:
-  lock:
-    wait:
-      #等待获取锁时间 秒
-      time: 3
-    lease:
-      #保存锁时间 秒
-      time: 20
-
 #Redisson 单机模式
 redisson:
   singleServerConfig:
@@ -50,3 +41,8 @@ redisson:
   threads: 0
   nettyThreads: 0
   transportMode: "NIO"
+jwt:
+  issuer: climb
+  access-expiration: 864000000
+  refresh-expiration: 8640000000
+  secret: 1234567asdfghjk

@@ -1,4 +1,4 @@
-package com.climb.gateway.util;
+package com.climb.gateway.jwt;
 
 import com.alibaba.fastjson.JSON;
 import com.climb.common.exception.GlobalException;
@@ -14,23 +14,14 @@ import io.jsonwebtoken.impl.DefaultClaims;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.util.Date;
 
 @Component
-@RefreshScope
 public class JwtTokenUtil {
-    private String secret="1234567asdfghjk";
-    // 过期时间 毫秒 10天
-//    @Value("${jwt.access.expiration:1000000}")
-    private long accessExpiration = 10*24*60*60*1000;
 
-    /**
-     * 刷新过期时间 100天
-     */
-//    @Value("${jwt.refresh.expiration:1000000}")
-    private long refreshExpiration = 100*24*60*60*1000;
-
-    private String issuer="zl";
+    @Resource
+    private JwtProperties jwtProperties;
 
 
     /**
@@ -57,13 +48,13 @@ public class JwtTokenUtil {
     public String generate(String subject,boolean isRefreshToken){
         Claims claims = new DefaultClaims();
         if(isRefreshToken){
-            claims.setExpiration(new Date(System.currentTimeMillis()+refreshExpiration));
+            claims.setExpiration(new Date(System.currentTimeMillis()+jwtProperties.getRefreshExpiration()));
         }else{
-            claims.setExpiration(new Date(System.currentTimeMillis()+accessExpiration));
+            claims.setExpiration(new Date(System.currentTimeMillis()+jwtProperties.getAccessExpiration()));
         }
         claims.setIssuedAt(new Date());
         claims.setSubject(subject);
-        claims.setIssuer(issuer);
+        claims.setIssuer(jwtProperties.getIssuer());
         claims.setId(IdUtils.nextId());
         return doGenerateToken(claims);
     }
@@ -87,7 +78,7 @@ public class JwtTokenUtil {
     private String doGenerateToken(Claims claims) {
         return Jwts.builder()
                 .setClaims(claims)
-                .signWith(SignatureAlgorithm.HS512, secret)
+                .signWith(SignatureAlgorithm.HS512, jwtProperties.getSecret())
                 .compact();
     }
 
@@ -101,7 +92,7 @@ public class JwtTokenUtil {
         Claims claims;
         try {
             claims = Jwts.parser()
-                    .setSigningKey(secret)
+                    .setSigningKey(jwtProperties.getSecret())
                     .parseClaimsJws(token)
                     .getBody();
         }catch (ExpiredJwtException expiredJwtException){

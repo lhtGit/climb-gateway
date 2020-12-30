@@ -6,9 +6,9 @@ import com.climb.common.exception.GlobalException;
 import com.climb.gateway.bean.JwtUser;
 import com.climb.gateway.constant.GatewayConstant;
 import com.climb.gateway.exception.ErrorCode;
-import com.climb.gateway.login.bean.UserAuthenticationToken;
+import com.climb.gateway.login.bean.UserAuthentication;
 import com.climb.gateway.login.bean.UserDetails;
-import com.climb.gateway.util.JwtTokenUtil;
+import com.climb.gateway.jwt.JwtTokenUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -72,7 +72,7 @@ public class RedisServerSecurityContextRepository implements ServerSecurityConte
                 Collection<SimpleGrantedAuthority> authorities = userDetails.getAuthoritys().stream()
                         .map(SimpleGrantedAuthority::new)
                         .collect(Collectors.toList());
-                context = new SecurityContextImpl(new UserAuthenticationToken(userDetails,authorities));
+                context = new SecurityContextImpl(new UserAuthentication(userDetails,authorities));
             }else{
                 //TODO 是否在验证token合法后，自动获得用户信息，因为理论来说是应该存在的（先不写）
             }

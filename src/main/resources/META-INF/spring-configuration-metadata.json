@@ -1,0 +1,37 @@
+{
+  "properties": [
+    {
+      "name": "jwt",
+      "type": "com.climb.gateway.jwt.JwtProperties",
+      "sourceType": "com.climb.gateway.jwt.JwtProperties"
+    },
+    {
+      "name": "jwt.secret",
+      "type": "java.lang.String",
+      "description": "秘钥",
+      "sourceType": "com.climb.gateway.jwt.JwtProperties",
+      "defaultValue": "1234567asdfghjk"
+    },
+    {
+      "name": "jwt.access-expiration",
+      "type": "java.lang.Long",
+      "description": "过期时间-毫秒",
+      "sourceType": "com.climb.gateway.jwt.JwtProperties",
+      "defaultValue": "10*24*60*60*1000L"
+    },
+    {
+      "name": "jwt.refresh-expiration",
+      "type": "java.lang.Long",
+      "description": "刷新过期时间-毫秒",
+      "sourceType": "com.climb.gateway.jwt.JwtProperties",
+      "defaultValue": "100*24*60*60*1000L"
+    },
+    {
+      "name": "jwt.issuer",
+      "type": "java.lang.String",
+      "description": "发行人",
+      "sourceType": "com.climb.gateway.jwt.JwtProperties",
+      "defaultValue": "climb"
+    }
+  ]
+}

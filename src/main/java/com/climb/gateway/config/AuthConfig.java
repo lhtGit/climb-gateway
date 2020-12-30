@@ -6,21 +6,26 @@ import com.climb.gateway.handler.MyServerAuthenticationEntryPoint;
 import com.climb.gateway.handler.MyServerAuthenticationFailureHandler;
 import com.climb.gateway.handler.MyServerAuthenticationSuccessHandler;
 import com.climb.gateway.login.bean.AuthorityInfo;
+import com.climb.gateway.login.converter.CustomizeServerAuthenticationConverter;
 import com.climb.gateway.rpc.RpcService;
 import com.climb.gateway.manager.UsernameReactiveAuthenticationManager;
 import com.google.common.collect.Lists;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.server.DelegatingServerAuthenticationEntryPoint;
 import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.security.web.server.authentication.AuthenticationWebFilter;
+import org.springframework.security.web.server.authentication.ServerFormLoginAuthenticationConverter;
+import org.springframework.security.web.server.util.matcher.MediaTypeServerWebExchangeMatcher;
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers;
 
 import javax.annotation.Resource;
+import java.util.Collections;
 import java.util.List;
 
 /*
@@ -51,6 +56,9 @@ public class AuthConfig  {
     private MyServerAuthenticationFailureHandler myServerAuthenticationFailureHandler;
 
     @Resource
+    private CustomizeServerAuthenticationConverter customizeServerAuthenticationConverter;
+
+    @Resource
     private RpcService rpcService;
 
 
@@ -58,13 +66,16 @@ public class AuthConfig  {
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
         //设置自定义认证管理器
         http.authenticationManager(usernameReactiveAuthenticationManager);
-        http.formLogin()
-                //登录成功handler
-                .authenticationSuccessHandler(serverAuthenticationSuccessHandler)
-                //设置一下三个配置是为了在浏览器访问login页面时不会跳转到登录页面
-                .authenticationEntryPoint(myServerAuthenticationEntryPoint)
-                .requiresAuthenticationMatcher(ServerWebExchangeMatchers.pathMatchers(HttpMethod.POST,LOGIN_PAGE))
-                .authenticationFailureHandler(myServerAuthenticationFailureHandler);
+
+
+        AuthenticationWebFilter authenticationFilter = new AuthenticationWebFilter(usernameReactiveAuthenticationManager);
+        authenticationFilter.setRequiresAuthenticationMatcher(ServerWebExchangeMatchers.pathMatchers(HttpMethod.POST,LOGIN_PAGE));
+        authenticationFilter.setAuthenticationFailureHandler(myServerAuthenticationFailureHandler);
+        authenticationFilter.setServerAuthenticationConverter(customizeServerAuthenticationConverter);
+        authenticationFilter.setAuthenticationSuccessHandler(serverAuthenticationSuccessHandler);
+        authenticationFilter.setSecurityContextRepository(serverSecurityContextRepository);
+        http.addFilterAt(authenticationFilter, SecurityWebFiltersOrder.FORM_LOGIN);
+
         //设置自定义保存用户信息（默认是放到session中）
         http.securityContextRepository(serverSecurityContextRepository);
 
@@ -86,7 +97,7 @@ public class AuthConfig  {
                             authorityInfo.getPath()).permitAll());
                     return authorizeExchangeSpec;
                 })
-                .subscribe(authorizeExchangeSpec -> authorizeExchangeSpec.anyExchange().permitAll());
+                .subscribe(authorizeExchangeSpec -> authorizeExchangeSpec.anyExchange().authenticated());
         //常规设置
         http.authorizeExchange()
                 .and().exceptionHandling()
@@ -98,10 +109,6 @@ public class AuthConfig  {
         return http.build();
     }
 
-    @Bean
-    public PasswordEncoder passwordEncoder(){
-        return new BCryptPasswordEncoder();
-    }
 
 
 

@@ -1,7 +1,7 @@
 package com.climb.gateway.login;
 
 import com.climb.common.user.auth.LoginUserInfo;
-import com.climb.gateway.login.bean.UserAuthenticationToken;
+import com.climb.gateway.login.bean.UserAuthentication;
 import com.climb.gateway.rpc.RpcService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -30,7 +30,7 @@ public class DefaultLoginServiceImpl implements LoginService {
                     Collection<SimpleGrantedAuthority> authorities = userDetails.getAuthoritys().stream()
                             .map(SimpleGrantedAuthority::new)
                             .collect(Collectors.toList());
-                    return  new UserAuthenticationToken(userDetails,authorities);
+                    return  new UserAuthentication(userDetails,authorities);
                 });
     }
 

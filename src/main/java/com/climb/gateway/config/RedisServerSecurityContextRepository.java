@@ -1,8 +1,12 @@
 package com.climb.gateway.config;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.climb.common.exception.GlobalException;
+import com.climb.common.user.bean.UserInfoBase;
+import com.climb.common.user.bean.UserInfoDetails;
+import com.climb.common.user.bean.base.DefaultUserInfoBase;
 import com.climb.gateway.bean.JwtUser;
 import com.climb.gateway.constant.GatewayConstant;
 import com.climb.gateway.exception.ErrorCode;
@@ -12,6 +16,7 @@ import com.climb.gateway.jwt.JwtTokenUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
@@ -23,6 +28,7 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 
@@ -45,10 +51,24 @@ public class RedisServerSecurityContextRepository implements ServerSecurityConte
         log.info("ServerSecurityContextRepository.save:{}",context);
         Authentication authentication = context.getAuthentication();
         //获得用户信息
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        //保存用户信息
-        redisTemplate.opsForValue().set(GatewayConstant.USER_AUTH_REDIS+userDetails.getFlag()
-                , JSON.toJSONString(userDetails)
+        UserInfoDetails userInfoDetails = (UserInfoDetails) authentication.getPrincipal();
+
+
+        //保存用户信息详情(user:info:{userid}:details)
+        redisTemplate.opsForValue().set(GatewayConstant.USER_INFO+userInfoDetails.getId()+GatewayConstant.USER_INFO_DETAILS
+                , JSON.toJSONString(userInfoDetails)
+        );
+
+
+        //保存用户基本信息(user:info:{userid}:base)
+        UserInfoBase userInfoBase = BeanUtil.copyProperties(userInfoDetails,DefaultUserInfoBase.class);
+        UserAuthentication userAuthentication = new UserAuthentication(userInfoBase, userInfoDetails.getResourceInfo()
+                .stream()
+                .map(resourceRes -> new SimpleGrantedAuthority(resourceRes.getId()))
+                .collect(Collectors.toList()));
+
+        redisTemplate.opsForValue().set(GatewayConstant.USER_INFO+userInfoDetails.getId()+GatewayConstant.USER_INFO_BASE
+                , JSON.toJSONString(userAuthentication)
         );
         return Mono.empty();
 
@@ -65,14 +85,9 @@ public class RedisServerSecurityContextRepository implements ServerSecurityConte
                 throw new GlobalException(ErrorCode.TOKEN_ACCESS_ILLEGAL);
             }
             String userFlag = userSubject.getUserFlag();
-            String userInfo = redisTemplate.opsForValue().get(GatewayConstant.USER_AUTH_REDIS+userFlag);
+            String userInfo = redisTemplate.opsForValue().get(GatewayConstant.USER_INFO+userFlag+GatewayConstant.USER_INFO_BASE);
             if(!StringUtils.isEmpty(userInfo)){
-                UserDetails userDetails = JSON.parseObject(userInfo,new TypeReference<UserDetails>(){});
-                //创建 Authentication，设置权限
-                Collection<SimpleGrantedAuthority> authorities = userDetails.getAuthoritys().stream()
-                        .map(SimpleGrantedAuthority::new)
-                        .collect(Collectors.toList());
-                context = new SecurityContextImpl(new UserAuthentication(userDetails,authorities));
+                context = new SecurityContextImpl(JSON.parseObject(userInfo,new TypeReference<UserAuthentication>(){}));
             }else{
                 //TODO 是否在验证token合法后，自动获得用户信息，因为理论来说是应该存在的（先不写）
             }

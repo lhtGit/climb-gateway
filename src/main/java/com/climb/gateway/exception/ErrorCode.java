@@ -25,7 +25,7 @@ public enum ErrorCode implements ErrorMessage {
 
     //user
     USER_ERROR(3020,"用户登录失败"),
-    USER_INFO_IS_NULL(3021,"用户信息不能为null"),
+    USER_MENU_IS_NULL(3021,"用户菜单信息不能为null"),
     USER_AUTHORITYS_IS_NULL(3022,"用户权限不能为null"),
     //rsa
     RSA_GENERATE_ERROR(3030,"RAS生成失败"),

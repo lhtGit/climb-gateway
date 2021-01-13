@@ -22,7 +22,7 @@ public class UsernamePasswordParseFrom implements ParseForm {
         String username = data.getFirst(this.usernameParameter);
         String password = data.getFirst(this.passwordParameter);
 
-        return new UserAuthentication(username,password,type());
+        return new UserAuthentication(username,password);
     }
 
     @Override

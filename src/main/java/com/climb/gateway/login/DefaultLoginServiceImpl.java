@@ -24,14 +24,7 @@ public class DefaultLoginServiceImpl implements LoginService {
     private RpcService rpcService;
     @Override
     public Mono<Authentication> loginAndGetToken(Mono<LoginUserInfo> userInfo) {
-        return rpcService.login(userInfo)
-                .map(userDetails -> {
-                    //创建 Authentication，设置权限
-                    Collection<SimpleGrantedAuthority> authorities = userDetails.getAuthoritys().stream()
-                            .map(SimpleGrantedAuthority::new)
-                            .collect(Collectors.toList());
-                    return  new UserAuthentication(userDetails,authorities);
-                });
+        return rpcService.login(userInfo).map(UserAuthentication::new);
     }
 
 

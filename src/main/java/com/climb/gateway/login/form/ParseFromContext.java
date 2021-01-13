@@ -42,7 +42,9 @@ public class ParseFromContext {
         if(parseForm == null){
             throw new GlobalException("没有找到登录类型"+userLoginType+"的解析器，请先添加解析器！");
         }
-        return  parseForm.createAuthentication(data);
+        UserAuthentication userAuthentication  = parseForm.createAuthentication(data);
+        userAuthentication.setUserLoginType(parseForm.type());
+        return userAuthentication ;
     }
 
 

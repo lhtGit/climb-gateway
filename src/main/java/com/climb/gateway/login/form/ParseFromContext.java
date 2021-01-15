@@ -2,9 +2,7 @@ package com.climb.gateway.login.form;
 
 import com.climb.common.exception.GlobalException;
 import com.climb.common.user.auth.UserLoginType;
-import com.climb.gateway.exception.ErrorCode;
-import com.climb.gateway.login.bean.UserAuthentication;
-import lombok.extern.slf4j.Slf4j;
+import com.climb.gateway.login.authentication.UserAuthentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.MultiValueMap;

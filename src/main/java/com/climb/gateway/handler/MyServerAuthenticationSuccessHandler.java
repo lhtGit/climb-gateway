@@ -1,8 +1,8 @@
 package com.climb.gateway.handler;
 
+import com.climb.common.user.bean.UserInfoDetails;
 import com.climb.common.util.ResultUtil;
 import com.climb.gateway.bean.UserToken;
-import com.climb.gateway.login.bean.UserDetails;
 import com.climb.gateway.jwt.JwtTokenUtil;
 import com.climb.gateway.util.Util;
 import lombok.extern.slf4j.Slf4j;
@@ -26,13 +26,12 @@ public class MyServerAuthenticationSuccessHandler implements ServerAuthenticatio
     private JwtTokenUtil jwtTokenUtil;
     @Override
     public Mono<Void> onAuthenticationSuccess(WebFilterExchange webFilterExchange, Authentication authentication) {
-        UserDetails userDetails = (UserDetails)authentication.getPrincipal();
+        UserInfoDetails userDetails = (UserInfoDetails)authentication.getPrincipal();
         //保存token信息
         //返回用户信息
         UserToken loginUserRes = UserToken.builder()
-                .userBaseInfo(userDetails.getUserBaseInfo())
-                .authorities(userDetails.getAuthoritys())
-                .tokenGroup(jwtTokenUtil.generateToken(userDetails.getUserBaseInfo().getId()))
+                .userInfoDetails(userDetails)
+                .tokenGroup(jwtTokenUtil.generateToken(userDetails.getId()))
                 .build();
         return Util.result(webFilterExchange.getExchange().getResponse(), ResultUtil.success(loginUserRes));
     }

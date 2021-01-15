@@ -1,4 +1,4 @@
-package com.climb.gateway.login.bean;
+package com.climb.gateway.login.authentication;
 
 import com.climb.common.user.auth.UserLoginType;
 import com.google.common.collect.Lists;

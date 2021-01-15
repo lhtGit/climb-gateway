@@ -1,8 +1,13 @@
 package com.climb.gateway.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.loadbalancer.reactive.ReactorLoadBalancerExchangeFilterFunction;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.MediaType;
+import org.springframework.http.codec.json.Jackson2JsonDecoder;
+import org.springframework.http.codec.json.Jackson2JsonEncoder;
 import org.springframework.web.reactive.function.client.*;
 import reactor.core.publisher.Mono;
 
@@ -16,6 +21,8 @@ import java.net.URI;
 @Configuration
 public class WebClientConfig {
 
+    @Autowired
+    private ObjectMapper objectMapper;
     /**
      * WebClient加入负载均衡
      * @author lht
@@ -27,6 +34,11 @@ public class WebClientConfig {
         CustomizeReactorLoadBalancerExchangeFilterFunction function = new CustomizeReactorLoadBalancerExchangeFilterFunction(exchangeFilterFunction);
         return WebClient.builder()
                 .filter(function)
+                //设置webclient 序列化
+                .codecs(configurer -> {
+                    configurer.defaultCodecs().jackson2JsonEncoder(new Jackson2JsonEncoder(objectMapper, MediaType.APPLICATION_JSON));
+                    configurer.defaultCodecs().jackson2JsonDecoder(new Jackson2JsonDecoder(objectMapper, MediaType.APPLICATION_JSON));
+                })
                 .build();
     }
 

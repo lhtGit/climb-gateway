@@ -3,12 +3,9 @@ package com.climb.gateway.rpc;
 import com.climb.common.bean.Result;
 import com.climb.common.exception.GlobalException;
 import com.climb.common.user.auth.LoginUserInfo;
+import com.climb.common.user.bean.ResourceInfo;
 import com.climb.common.user.bean.UserInfoDetails;
-import com.climb.common.user.bean.base.DefaultUserInfoDetails;
-import com.climb.common.util.ResultUtil;
 import com.climb.gateway.exception.ErrorCode;
-import com.climb.gateway.login.bean.AuthorityInfo;
-import com.climb.gateway.login.bean.UserDetails;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
@@ -35,6 +32,7 @@ public class DefaultRpcServiceImpl implements RpcService {
     @Override
     public Mono<UserInfoDetails> login(Mono<LoginUserInfo> userInfo) {
         return  webClient.post()
+//                .uri("CLIMB-TEST-USER")
                 .uri(uriBuilder ->
                         uriBuilder.scheme("http")
                                 .host("127.0.0.1")
@@ -46,13 +44,13 @@ public class DefaultRpcServiceImpl implements RpcService {
                 .acceptCharset(Charset.defaultCharset())
                 .body(userInfo,LoginUserInfo.class)
                 .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<Result<DefaultUserInfoDetails>>() {})
+                .bodyToMono(new ParameterizedTypeReference<Result<UserInfoDetails>>() {})
                 //重试1次 指数级增长的时间间隔 因数0.5
                 //.retryWhen(Retry.backoff(1, Duration.ofSeconds(5)))
                 //逻辑处理
                 .map(userDetailsResult -> {
                     checkUser(userDetailsResult);
-                    return (UserInfoDetails) userDetailsResult.getData();
+                    return userDetailsResult.getData();
                 })
                 .doOnError(e -> {
                     log.error("登录获取用户信息异常",e);
@@ -60,7 +58,7 @@ public class DefaultRpcServiceImpl implements RpcService {
     }
 
     @Override
-    public Mono<Collection<AuthorityInfo>> getAuthorityAll() {
+    public Mono<Collection<ResourceInfo>> getAuthorityAll() {
         return Mono.just(Lists.newArrayList());
 //        return webClient.get()
 //                .uri(uriBuilder ->
@@ -73,12 +71,12 @@ public class DefaultRpcServiceImpl implements RpcService {
 //                .accept(MediaType.APPLICATION_JSON)
 //                .acceptCharset(Charset.defaultCharset())
 //                .retrieve()
-//                .bodyToMono(new ParameterizedTypeReference<Result<AuthorityInfo>>(){})
+//                .bodyToMono(new ParameterizedTypeReference<Result<ResourceInfo>>(){})
 //                .flatMap(result -> {
 //                    if(!result.isSuccess()){
 //                        return Mono.error(new GlobalException(result.getMsg(),result.getCode()));
 //                    }
-//                    Collection<AuthorityInfo> authorityInfos =  result.getDataList();
+//                    Collection<ResourceInfo> authorityInfos =  result.getDataList();
 //                    return Mono.just(authorityInfos);
 //                })
 //                .doOnError(e -> {
@@ -94,7 +92,7 @@ public class DefaultRpcServiceImpl implements RpcService {
      * @since  2020/12/25 14:33
      * @param userDetailsResult
      */
-    private void checkUser(Result<DefaultUserInfoDetails> userDetailsResult){
+    private void checkUser(Result<UserInfoDetails> userDetailsResult){
         //异常信息
         if(!userDetailsResult.isSuccess()){
             throw new GlobalException(userDetailsResult.getMsg(),userDetailsResult.getCode());

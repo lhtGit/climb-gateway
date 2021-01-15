@@ -1,10 +1,8 @@
 package com.climb.gateway.bean;
 
-import com.climb.common.user.UserBaseInfo;
+import com.climb.common.user.bean.UserInfoDetails;
 import lombok.Builder;
 import lombok.Data;
-
-import java.util.Collection;
 
 /**
  * 返回前端用户信息，包括token
@@ -14,9 +12,8 @@ import java.util.Collection;
 @Data
 @Builder
 public class UserToken {
-    private UserBaseInfo userBaseInfo;
+    private UserInfoDetails userInfoDetails;
 
-    private Collection<String> authorities;
 
     private TokenGroup tokenGroup;
 }

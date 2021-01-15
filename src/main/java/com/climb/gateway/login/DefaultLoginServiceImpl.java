@@ -1,16 +1,13 @@
 package com.climb.gateway.login;
 
 import com.climb.common.user.auth.LoginUserInfo;
-import com.climb.gateway.login.bean.UserAuthentication;
+import com.climb.gateway.login.authentication.UserAuthentication;
 import com.climb.gateway.rpc.RpcService;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 import javax.annotation.Resource;
-import java.util.Collection;
-import java.util.stream.Collectors;
 
 /**
  * 登录server默认实现

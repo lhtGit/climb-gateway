@@ -1,9 +1,8 @@
 package com.climb.gateway.rpc;
 
 import com.climb.common.user.auth.LoginUserInfo;
+import com.climb.common.user.bean.ResourceInfo;
 import com.climb.common.user.bean.UserInfoDetails;
-import com.climb.gateway.login.bean.UserDetails;
-import com.climb.gateway.login.bean.AuthorityInfo;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
@@ -30,5 +29,5 @@ public interface RpcService {
      * @author lht
      * @since  2020/12/25 16:47
      */
-    Mono<Collection<AuthorityInfo>> getAuthorityAll();
+    Mono<Collection<ResourceInfo>> getAuthorityAll();
 }

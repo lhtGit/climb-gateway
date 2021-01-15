@@ -1,7 +1,7 @@
 package com.climb.gateway.login.form;
 
 import com.climb.common.user.auth.UserLoginType;
-import com.climb.gateway.login.bean.UserAuthentication;
+import com.climb.gateway.login.authentication.UserAuthentication;
 import org.springframework.util.MultiValueMap;
 
 /**

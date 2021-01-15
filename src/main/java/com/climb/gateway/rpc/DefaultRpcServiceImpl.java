@@ -32,7 +32,11 @@ public class DefaultRpcServiceImpl implements RpcService {
     @Override
     public Mono<UserInfoDetails> login(Mono<LoginUserInfo> userInfo) {
         return  webClient.post()
-//                .uri("CLIMB-TEST-USER")
+//                 .uri(uriBuilder ->
+//                        uriBuilder.host("gglc-erp-base")
+//                                .path("/erp/base/employee/login")
+//                                .build()
+//                )
                 .uri(uriBuilder ->
                         uriBuilder.scheme("http")
                                 .host("127.0.0.1")

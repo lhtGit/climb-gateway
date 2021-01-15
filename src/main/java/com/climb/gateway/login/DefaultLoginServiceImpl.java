@@ -1,7 +1,7 @@
 package com.climb.gateway.login;
 
 import com.climb.common.user.auth.LoginUserInfo;
-import com.climb.gateway.login.authentication.UserAuthentication;
+import com.climb.gateway.authentication.UserAuthentication;
 import com.climb.gateway.rpc.RpcService;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;

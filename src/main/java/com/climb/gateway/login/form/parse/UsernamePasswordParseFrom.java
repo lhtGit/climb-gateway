@@ -1,7 +1,7 @@
 package com.climb.gateway.login.form.parse;
 
 import com.climb.common.user.auth.UserLoginType;
-import com.climb.gateway.login.authentication.UserAuthentication;
+import com.climb.gateway.authentication.UserAuthentication;
 import com.climb.gateway.login.form.ParseForm;
 import org.springframework.stereotype.Component;
 import org.springframework.util.MultiValueMap;

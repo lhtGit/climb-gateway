@@ -9,7 +9,7 @@ import com.climb.common.user.bean.UserInfoBase;
 import com.climb.gateway.bean.JwtUser;
 import com.climb.gateway.constant.GatewayConstant;
 import com.climb.gateway.exception.ErrorCode;
-import com.climb.gateway.login.authentication.UserAuthentication;
+import com.climb.gateway.authentication.UserAuthentication;
 import com.climb.gateway.jwt.JwtTokenUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

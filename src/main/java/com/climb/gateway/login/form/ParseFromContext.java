@@ -2,7 +2,7 @@ package com.climb.gateway.login.form;
 
 import com.climb.common.exception.GlobalException;
 import com.climb.common.user.auth.UserLoginType;
-import com.climb.gateway.login.authentication.UserAuthentication;
+import com.climb.gateway.authentication.UserAuthentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.MultiValueMap;

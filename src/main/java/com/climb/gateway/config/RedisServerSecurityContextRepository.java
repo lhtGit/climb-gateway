@@ -95,7 +95,10 @@ public class RedisServerSecurityContextRepository implements ServerSecurityConte
             String userFlag = userSubject.getUserFlag();
             String userInfo = redisTemplate.opsForValue().get(USER_INFO+userFlag+USER_AUTHENTICATION);
             if(!StringUtils.isEmpty(userInfo)){
-                context = new SecurityContextImpl(JSON.parseObject(userInfo,new TypeReference<UserAuthentication>(){}));
+                UserAuthentication userAuthentication = JSON.parseObject(userInfo,new TypeReference<UserAuthentication>(){});
+                //显式设置为已登录 避免因为生成对象时 设置成false
+                userAuthentication.setAuthenticated(true);
+                context = new SecurityContextImpl(userAuthentication);
             }else{
                 //TODO 是否在验证token合法后，自动获得用户信息，因为理论来说是应该存在的（先不写）
             }

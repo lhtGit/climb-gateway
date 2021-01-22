@@ -1,5 +1,7 @@
 package com.climb.gateway.config;
 
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.reactive.CorsWebFilter;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 
@@ -7,9 +9,9 @@ import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
  * @author lht
  * @since 2020/10/13 15:05
  */
-//@Configuration
+@Configuration
 public class CorsConfiguration {
-//    @Bean
+    @Bean
     public CorsWebFilter corsWebFilter(){
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         org.springframework.web.cors.CorsConfiguration corsConfiguration = new org.springframework.web.cors.CorsConfiguration();

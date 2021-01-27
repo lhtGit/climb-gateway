@@ -8,6 +8,10 @@ import com.climb.common.user.bean.UserInfoDetails;
 import com.climb.gateway.exception.ErrorCode;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -25,9 +29,11 @@ import java.util.Collection;
  */
 @Component
 @Slf4j
-public class DefaultRpcServiceImpl implements RpcService {
+public class DefaultRpcServiceImpl implements RpcService, ApplicationContextAware {
     @Resource
     private WebClient webClient;
+
+    private ConfigurableApplicationContext context;
 
     @Override
     public Mono<UserInfoDetails> login(Mono<LoginUserInfo> userInfo) {
@@ -61,33 +67,35 @@ public class DefaultRpcServiceImpl implements RpcService {
                 });
     }
 
+
     @Override
     public Mono<Collection<ResourceInfo>> getAuthorityAll() {
-        return Mono.just(Lists.newArrayList());
-//        return webClient.get()
-//                .uri(uriBuilder ->
-//                        uriBuilder.scheme("http")
-//                                .host("127.0.0.1")
-//                                .port(8082)
-//                                .path("/user/test/auth/all")
-//                                .build()
-//                )
-//                .accept(MediaType.APPLICATION_JSON)
-//                .acceptCharset(Charset.defaultCharset())
-//                .retrieve()
-//                .bodyToMono(new ParameterizedTypeReference<Result<ResourceInfo>>(){})
-//                .flatMap(result -> {
-//                    if(!result.isSuccess()){
-//                        return Mono.error(new GlobalException(result.getMsg(),result.getCode()));
-//                    }
-//                    Collection<ResourceInfo> authorityInfos =  result.getDataList();
-//                    return Mono.just(authorityInfos);
-//                })
-//                .doOnError(e -> {
-//                    log.error("获取所有权限异常",e);
-//                });
+//        return Mono.just(Lists.newArrayList());
+        return webClient.get()
+                .uri(uriBuilder ->
+                        uriBuilder.scheme("http")
+                                .host("127.0.0.1")
+                                .port(8082)
+                                .path("/user/test/auth/all")
+                                .build()
+                )
+                .accept(MediaType.APPLICATION_JSON)
+                .acceptCharset(Charset.defaultCharset())
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<Result<ResourceInfo>>(){})
+                .flatMap(result -> {
+                    if(!result.isSuccess()){
+                        return Mono.error(new GlobalException(result.getMsg(),result.getCode()));
+                    }
+                    Collection<ResourceInfo> authorityInfos =  result.getDataList();
+                    return Mono.just(authorityInfos);
+                })
+                .doOnError(e -> {
+                    log.error("获取所有权限异常",e);
+                    //停止项目
+                    context.close();
+                });
     }
-
 
 
     /**
@@ -111,6 +119,13 @@ public class DefaultRpcServiceImpl implements RpcService {
         }
         if(userDetails.getMenuInfo()==null){
             throw new GlobalException(ErrorCode.USER_MENU_IS_NULL);
+        }
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        if (applicationContext instanceof ConfigurableApplicationContext) {
+            this.context =  (ConfigurableApplicationContext) applicationContext;
         }
     }
 }
